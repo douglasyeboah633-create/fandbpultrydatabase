@@ -1,0 +1,8 @@
+# Dependencies for the ONLINE copy of the farm web (Vercel reads this file).
+# Same list as backend/requirements.txt, without gunicorn (the host runs it).
+flask
+flask-cors
+flask-bcrypt
+flask-jwt-extended
+flask-sqlalchemy
+python-dotenv

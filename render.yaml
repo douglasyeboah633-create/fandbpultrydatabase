@@ -1,0 +1,20 @@
+services:
+  - type: web
+    name: fandb-poultry
+    runtime: python
+    plan: free
+    buildCommand: pip install -r backend/requirements.txt
+    startCommand: gunicorn --chdir backend -b 0.0.0.0:$PORT app:app
+    envVars:
+      - key: PYTHON_VERSION
+        value: 3.11.9
+      - key: MANAGER_NAME
+        sync: false
+      - key: MANAGER_USERNAME
+        sync: false
+      - key: MANAGER_EMAIL
+        sync: false
+      - key: MANAGER_PASSWORD
+        sync: false
+      - key: JWT_SECRET
+        generateValue: true

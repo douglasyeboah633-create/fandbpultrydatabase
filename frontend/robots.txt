@@ -1,0 +1,11 @@
+User-agent: *
+Allow: /
+
+# Staff pages must never appear in search results.
+Disallow: /login.html
+Disallow: /manager.html
+Disallow: /worker.html
+Disallow: /api/
+
+# Once you have a real public web address, add your sitemap line, for example:
+# Sitemap: https://YOUR-DOMAIN/sitemap.xml

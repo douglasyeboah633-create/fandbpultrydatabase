@@ -1,0 +1,4 @@
+# Keep Windows batch files with Windows line endings even when the repo
+# is downloaded as a ZIP from GitHub, so run.bat works when double-clicked.
+*.bat text eol=crlf
+*.cmd text eol=crlf

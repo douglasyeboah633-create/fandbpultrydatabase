@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Staff Login - F & B Poultry</title>
+<meta name="robots" content="noindex, nofollow">
+<link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+<div class="loginwrap">
+<div style="text-align:center"><div class="logo" style="margin:0 auto">🐔</div>
+<h2 style="color:#14532d">F & B Poultry Farm</h2>
+<p>Login to continue</p></div>
+<div id="m" class="msg"></div>
+<div id="loginbox">
+<form class="f" onsubmit="doLogin(event)">
+<label>Username or Email</label>
+<input id="u" required placeholder="Your username or email">
+<label>Password</label>
+<input id="p" type="password" required placeholder="••••••">
+<label style="font-weight:400"><input type="checkbox" id="rm" style="width:auto"> Remember me</label>
+<button class="btn btn-g" type="submit">Login</button>
+<button class="btn btn-o" type="button" onclick="forgot()">Forgot password?</button>
+<button class="btn btn-o" type="button" onclick="location.href='index.html'">← Home</button>
+</form>
+</div>
+<div id="setupbox" style="display:none">
+<form class="f" onsubmit="doSetup(event)">
+<div style="background:#ecfdf5;border:1px solid #a7f3d0;padding:8px;border-radius:8px"><b>🐣 First-time set-up</b><br><small>This copy of the farm has no manager yet. Choose the username and password you will use from now on.</small></div>
+<label>Choose your username</label>
+<input id="su" required placeholder="e.g. manager" autocomplete="username">
+<label>Choose a password (at least 8 characters)</label>
+<input id="sp" type="password" required minlength="8" placeholder="at least 8 characters" autocomplete="new-password">
+<label>Repeat the password</label>
+<input id="sc" type="password" required minlength="8" placeholder="type it again" autocomplete="new-password">
+<button class="btn btn-g" type="submit">Create my manager account</button>
+</form>
+</div>
+<p style="margin-top:10px;font-size:13px">Ask the farm manager for your username and password.<br>Staff only — this page is not listed in search engines.</p>
+</div>
+<script src="js/app.js"></script>
+<script>
+async function doLogin(e){
+ e.preventDefault();
+ try{
+  const j = await api('/api/auth/login',{method:'POST',body:{username:$('#u').value,password:$('#p').value}});
+   saveSession(j, $('#rm').checked);
+   keepCreds($('#u').value, $('#p').value, $('#rm').checked);
+  say('#m',true,j.message||'Welcome!');
+  setTimeout(()=>{ location.href = j.user.role==='manager'?'manager.html':'worker.html'; },600);
+ }catch(err){ say('#m',false,err.message); }
+}
+async function forgot(){
+ try{ const j = await api('/api/auth/forgot',{method:'POST',body:{}}); say('#m',true,j.message); }
+ catch(err){ say('#m',false,err.message); }
+}
+async function doSetup(e){
+ e.preventDefault();
+ const u=$('#su').value.trim(), p=$('#sp').value, c=$('#sc').value;
+ if(p.length<8){ say('#m',false,'Choose a password of at least 8 characters.'); return; }
+ if(p!==c){ say('#m',false,'The two passwords are not the same.'); return; }
+ try{
+  const j=await api('/api/auth/setup',{method:'POST',body:{username:u,password:p}});
+   saveSession(j, $('#rm').checked);
+   keepCreds(u, p, $('#rm').checked);
+  say('#m',true,j.message||'Your manager account is ready!');
+  setTimeout(()=>{ location.href='manager.html'; },700);
+ }catch(err){ say('#m',false,err.message); }
+}
+// If this copy of the app was recycled and lost the manager account, the
+// stored credentials put it back and sign in again - so simply opening this
+// page is enough to get straight back to the dashboard.
+(async function(){
+  if (tok()) return;
+  var c = creds();
+  if (!c) return;
+  var u = document.getElementById('u'), p = document.getElementById('p'), rm = document.getElementById('rm');
+  if (u && c.u) u.value = c.u;
+  if (p && c.p) p.value = c.p;
+  if (rm && localStorage.getItem('fb_creds')) rm.checked = true;
+  if (u && p && c.u) {
+    say('#m', true, 'Signing you back in...');
+    var ok = await relogin();
+    if (ok) {
+      var usr = me();
+      location.href = (usr && usr.role === 'manager') ? 'manager.html' : 'worker.html';
+    } else {
+      say('#m', false, 'Please log in again.');
+    }
+  }
+})();
+</script>
+</body>
+</html>

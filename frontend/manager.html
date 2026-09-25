@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Manager - F & B Poultry</title>
+<meta name="robots" content="noindex, nofollow">
+<link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+<div class="topbar"><button class="menu-btn" onclick="toggleMenu()">☰</button><div class="logo">🐔</div><div><h1>Manager</h1><small id="who"></small></div><div class="spacer"></div><button class="btn btn-o" onclick="logout()">Logout</button></div>
+<div class="wrap">
+<div class="side" id="side">
+<a href="#" class="on" onclick="show('dash');return false;">📊 Dashboard</a>
+<a href="#" onclick="show('shift');return false;">📋 Worker Reports</a>
+<a href="#" onclick="show('archive');return false;">📚 Report Archive</a>
+<a href="#" onclick="show('records');return false;">📒 My Records</a>
+<a href="#" onclick="show('workers');return false;">👷 Workers</a>
+<a href="#" onclick="logout();return false;">🚪 Logout</a>
+</div>
+<div class="main">
+<div id="m" class="msg"></div>
+<div id="dash">
+<div class="hero">
+<h2 id="dhead">Today at a glance</h2>
+<small id="dsub"></small>
+</div>
+<div class="cards">
+<div class="card"><span class="ci">💰</span><b id="dMoney">—</b><small>Money received today</small></div>
+<div class="card"><span class="ci">🥚</span><b id="dEggs">—</b><small>Eggs collected today</small></div>
+<div class="card"><span class="ci">🐔</span><b id="dChickens">—</b><small>Chickens sold today</small></div>
+<div class="card"><span class="ci">☠️</span><b id="dDeaths">—</b><small>Birds died today</small></div>
+<div class="card"><span class="ci">📋</span><b id="dReports">—</b><small>Reports received today</small></div>
+<div class="card"><span class="ci">👷</span><b id="dCover">—</b><small>Workers who reported</small></div>
+</div>
+<div id="warn" style="margin-top:12px"></div>
+<div class="panel" style="margin-top:12px">
+<h2>📈 Last 30 days</h2>
+<small>Each bar is one day. Put your mouse on a bar to see that day's figure.</small>
+<div class="grid3" style="margin-top:10px">
+<div><b class="ct">💰 Money received</b><div id="chartMoney" class="chart"></div></div>
+<div><b class="ct">🥚 Eggs collected</b><div id="chartEggs" class="chart"></div></div>
+<div><b class="ct">☠️ Birds died</b><div id="chartDeaths" class="chart"></div></div>
+</div>
+</div>
+<div class="panel" style="margin-top:12px">
+<div class="row"><h2 id="cmpTitle">📆 Month vs last month</h2><div class="spacer"></div><button class="btn btn-o" onclick="expCmpCSV()">⬇️ Download CSV</button></div>
+<div id="cmp" style="margin-top:8px">Loading...</div>
+</div>
+<div class="panel" style="margin-top:12px">
+<h2>🧰 Manager tools</h2>
+<small>Keep a safe copy of everything: workers, reports, archive and your records.</small>
+<div class="row" style="margin-top:10px">
+<button class="btn btn-g" onclick="downloadBackup()">⬇️ Download full backup</button>
+<button class="btn btn-o" onclick="show('shift')">📋 Open worker reports</button>
+<button class="btn btn-o" onclick="show('records')">📒 Open my records</button>
+</div>
+<small id="bknote"></small>
+</div>
+</div>
+<div id="shift" style="display:none">
+<div class="row"><input id="shdate" type="date" style="max-width:200px" onchange="loadShift()"><button class="btn btn-o" onclick="loadShift()">Load day</button><div class="spacer"></div><button class="btn btn-o" onclick="expWeeklyCSV()">⬇️ Download weekly CSV</button><button class="btn btn-g" onclick="printDay()">🖨️ Print / Save as PDF (this day)</button></div>
+<div class="panel" style="margin-top:12px"><b>Today's report: </b><span id="shcov">Loading...</span></div>
+<div class="panel" style="margin-top:12px"><b>Day totals:</b> <span id="shtot"></span></div>
+<div id="shlist" style="margin-top:12px"></div>
+</div>
+<div id="archive" style="display:none">
+<div class="panel"><h2>📚 Report Archive</h2><small>Every report the manager has gone through is kept here for future reference. Nothing is lost.</small></div>
+<div class="row" style="margin-top:12px"><input id="arcdate" type="date" style="max-width:200px" onchange="loadArchive()"><button class="btn btn-o" onclick="loadArchive()">Load day</button><button class="btn btn-o" onclick="document.getElementById('arcdate').value='';loadArchive()">Show all dates</button><div class="spacer"></div><input id="arcq" placeholder="🔍 Search: worker, date, notes, amount..." style="max-width:260px" onkeydown="if(event.key==='Enter'){searchArchive();}"><button class="btn btn-g" onclick="searchArchive()">🔍 Search</button><button class="btn btn-o" onclick="expArchiveCSV()">⬇️ Download archive CSV</button><button class="btn btn-g" onclick="printArchive()">🖨️ Print / Save as PDF (list)</button></div>
+<div id="arclist" style="margin-top:12px">Loading...</div>
+</div>
+<div id="records" style="display:none">
+<div class="panel"><h2>📒 My Records</h2><small>Your own space to write things down — goods you received, money you paid out, repairs, reminders, anything you want to remember. Only you (the manager) can see this.</small></div>
+<div class="panel" style="margin-top:12px"><h2>✍️ Write a new record</h2>
+<form class="f" onsubmit="addRec(event)">
+<div class="grid3">
+<div><label>Date</label><input id="recDate" type="date" required></div>
+<div><label>Type</label><select id="recCat"><option>Goods received</option><option>Money paid out</option><option>Reminder</option><option>Repair / Work</option><option>Note</option></select></div>
+<div><label>Amount GH₵ (optional)</label><input id="recAmount" type="number" step="0.01" min="0" placeholder="0.00"></div>
+</div>
+<div style="margin-top:8px"><label>Title</label><input id="recTitle" placeholder="e.g. Received 40 crates of eggs from Mama Farm" required></div>
+<div style="margin-top:8px"><label>More details (optional)</label><textarea id="recNote" rows="3" placeholder="Write anything else you want to remember..."></textarea></div>
+<input type="hidden" id="recEdit">
+<button class="btn btn-g" id="recBtn">💾 Save record</button>
+<button class="btn btn-o" type="button" onclick="resetRec()">Clear form</button>
+</form></div>
+<div class="panel" style="margin-top:12px">
+<div class="row"><h2>📚 All my records</h2><div class="spacer"></div><input id="recSearch" placeholder="🔍 Search my records..." style="max-width:240px" oninput="renderRecs()"><select id="recFilter" onchange="renderRecs()"><option value="">All types</option><option>Goods received</option><option>Money paid out</option><option>Reminder</option><option>Repair / Work</option><option>Note</option></select><button class="btn btn-o" onclick="expRecCSV()">⬇️ Download CSV</button><button class="btn btn-g" onclick="printRecs()">🖨️ Print / Save as PDF</button></div>
+<div id="recSum" style="margin-top:10px"></div>
+<div id="recList" style="margin-top:10px">Loading...</div>
+</div>
+</div>
+<div id="workers" style="display:none" class="panel"><h2>Workers</h2>
+<form class="f" onsubmit="addW(event)"><div class="grid2"><div><label>Name</label><input id="wn" required></div><div><label>Username</label><input id="wu" required></div></div><div class="grid2"><div><label>Email</label><input id="we" required></div><div><label>Password</label><input id="wp" placeholder="Choose a password" autocomplete="new-password" required></div></div><button class="btn btn-g">Add Worker</button></form><hr><div id="wlist"></div></div>
+</div>
+</div>
+<div id="printarea"></div>
+<div id="lb" class="lb" onclick="closeImg()"><img id="lbimg" alt="photo" onclick="event.stopPropagation()"></div>
+<script src="js/app.js"></script>
+<script src="js/manager.js"></script>
+</body>
+</html>

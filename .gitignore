@@ -1,0 +1,32 @@
+# ============================================================
+#  NEVER UPLOAD THESE - they hold real farm data or secrets.
+#  This list is what keeps your farm safe on a public GitHub.
+# ============================================================
+backend/farm.db
+backend/farm.db-journal
+backend/farm.db-wal
+backend/uploads/
+backend/server.pid
+backend/.env
+backend/.secret_key
+.env
+
+# Python leftovers
+__pycache__/
+*.pyc
+*.pyo
+
+# Logs
+*.log
+backend/_out.log
+backend/_err.log
+
+# Editors and Windows junk
+.vscode/
+.idea/
+Thumbs.db
+desktop.ini
+.DS_Store
+
+# The one-time pack prepared for the GitHub web upload page
+_github-upload-pack/

@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>F & B Poultry Farm | Fresh Eggs, Broilers, Layers & Day-old Chicks</title>
+<meta name="description" content="F & B Poultry Farm supplies fresh eggs by the crate, live broilers, layers, day-old chicks and organic manure. Healthy birds, honest weights and fair prices from our poultry farm.">
+<meta name="keywords" content="F and B Poultry Farm, poultry farm, fresh eggs, egg crates, live broilers, layers, day-old chicks, organic manure, chicken farm, poultry supplier, Ghana poultry">
+<meta name="author" content="F & B Poultry Farm">
+<meta name="robots" content="index, follow">
+<meta name="theme-color" content="#14532d">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="F & B Poultry Farm">
+<meta property="og:title" content="F & B Poultry Farm | Fresh Eggs, Broilers & Layers">
+<meta property="og:description" content="Fresh eggs by the crate, live broilers, layers, day-old chicks and organic manure straight from our poultry farm.">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="F & B Poultry Farm | Fresh Eggs, Broilers & Layers">
+<meta name="twitter:description" content="Fresh eggs by the crate, live broilers, layers, day-old chicks and organic manure straight from our poultry farm.">
+<!-- When you have a real website address, add it here so Google knows the main page:
+     <link rel="canonical" href="https://YOUR-DOMAIN/">
+     <meta property="og:url" content="https://YOUR-DOMAIN/"> -->
+<link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+<div class="topbar">
+<div class="logo">🐔</div>
+<div><h1>F & B Poultry Farm</h1><small>Healthy birds • Fresh eggs • Honest sales</small></div>
+<div class="spacer"></div>
+</div>
+<div style="max-width:1100px;margin:0 auto;padding:16px">
+<div class="hero">
+<h2>Welcome to F & B Poultry Farm 🐣</h2>
+<p>Workers record products, sales and daily shift reports. The manager approves and monitors everything.</p>
+<div class="row" style="margin-top:12px">
+<button class="btn btn-g" onclick="location.href='login.html'">Login</button>
+</div>
+</div>
+<div class="cards">
+<div class="card"><h3>Live Birds</h3><div class="big">🐔</div><p>Broilers & Layers</p></div>
+<div class="card"><h3>Fresh Eggs</h3><div class="big">🥚</div><p>Crates daily</p></div>
+<div class="card"><h3>Chicks</h3><div class="big">🐥</div><p>Day-old chicks</p></div>
+<div class="card"><h3>Manure</h3><div class="big">🌱</div><p>Organic manure</p></div>
+</div>
+<div class="panel"><h2>Available Products</h2><div class="twrap"><table><thead><tr><th>Product</th><th>Category</th><th>Price</th><th>Stock</th></tr></thead><tbody id="plist"><tr><td colspan="4">Loading...</td></tr></tbody></table></div></div>
+<div class="panel"><h2>About F &amp; B Poultry Farm</h2><p>F &amp; B Poultry Farm keeps healthy broilers and layers and sells fresh eggs by the crate, live chickens, day-old chicks and organic manure. Every sale and every daily farm record is written down the same day, so customers get honest weights and fair prices.</p><p style="margin-top:8px"><small>Farm staff: open the <a href="login.html">login page</a> to send your reports.</small></p></div>
+</div>
+<script src="js/app.js"></script>
+<script>
+async function load(){
+ try{
+  const all = await fetch('/api/products').then(r=>r.json()).catch(()=>[]);
+  const rows = Array.isArray(all)?all.filter(p=>p.status==='approved'):[];
+  $('#plist').innerHTML = rows.length?rows.map(p=>`<tr><td>${p.name}</td><td>${p.category}</td><td>${money(p.price_per_unit)}/${p.unit}</td><td>${p.quantity}</td></tr>`).join(''):'<tr><td colspan=4>No products yet. Run seed.py first.</td></tr>';
+ }catch(e){ $('#plist').innerHTML='<tr><td colspan=4>Start backend first.</td></tr>'; }
+}
+load();
+</script>
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "LocalBusiness",
+  "name": "F & B Poultry Farm",
+  "description": "Poultry farm selling fresh eggs by the crate, live broilers, layers, day-old chicks and organic manure.",
+  "slogan": "Healthy birds, fresh eggs, honest sales",
+  "currenciesAccepted": "GHS",
+  "makesOffer": [
+    {"@type": "Offer", "itemOffered": {"@type": "Product", "name": "Fresh eggs (crates)"}},
+    {"@type": "Offer", "itemOffered": {"@type": "Product", "name": "Live broilers"}},
+    {"@type": "Offer", "itemOffered": {"@type": "Product", "name": "Layers"}},
+    {"@type": "Offer", "itemOffered": {"@type": "Product", "name": "Day-old chicks"}},
+    {"@type": "Offer", "itemOffered": {"@type": "Product", "name": "Organic manure"}}
+  ]
+}
+</script>
+</body>
+</html>

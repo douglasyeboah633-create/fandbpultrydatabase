@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Worker - F & B Poultry</title>
+<meta name="robots" content="noindex, nofollow">
+<link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+<div class="topbar"><button class="menu-btn" onclick="toggleMenu()">☰</button><div class="logo">🐔</div><div><h1>Worker Dashboard</h1><small id="who"></small></div><div class="spacer"></div><button class="btn btn-o" onclick="logout()">Logout</button></div>
+<div class="wrap">
+<div class="side" id="side">
+<a href="#" class="on" onclick="show('dash');return false;">📊 Dashboard</a>
+<a href="#" onclick="show('shift');return false;">📋 Daily Report</a>
+<a href="#" onclick="show('notif');return false;">🔔 Notifications</a>
+<a href="#" onclick="logout();return false;">🚪 Logout</a>
+</div>
+<div class="main">
+<div id="m" class="msg"></div>
+<div id="dash">
+<div class="cards" id="cards"></div>
+<div class="bigbtns">
+<button onclick="show('shift')">📋<br>Send Daily Report</button>
+<button onclick="show('notif')">🔔<br>Notifications</button>
+</div>
+<div class="panel"><h2>Recent Activities</h2><div id="recent"></div></div>
+</div>
+<div id="shift" style="display:none">
+<div class="panel"><h2>Today's report</h2><div id="shcov">Loading...</div></div>
+<div class="panel" style="margin-top:12px"><h2>📋 Daily Report — one report for the whole day</h2>
+<div class="panel" style="background:#fffbeb;border:1px solid #fcd34d"><small><b>⚠️ Every space must be filled.</b> If nothing happened, write <b>0</b> for a number or <b>None</b> for words. You cannot send the report until every space is filled.</small></div>
+<form class="f" onsubmit="shSubmit(event)">
+<div class="grid2"><div><label>Date *</label><input id="shd" type="date" required></div><div><label>Farm section *</label><input id="shs" value="Main" required></div></div>
+<label>🥚 1. EGGS SOLD</label>
+<div class="grid2"><div><label>Egg crates sold * (e.g. 49)</label><input id="shks" type="number" min="0" step="1" placeholder="e.g. 49" required></div><div><label>Live chickens sold *</label><input id="shcs" type="number" min="0" step="1" placeholder="e.g. 12" required></div></div>
+<label>☠️ 2. MORTALITY (birds that died)</label>
+<div class="grid2"><div><label>Birds died (number — write 0 if none) *</label><input id="shdd" type="number" min="0" step="1" placeholder="e.g. 2 (or 0)" required></div><div><label>Reason *</label><input id="shdr" placeholder="e.g. disease, heat, none" required></div></div>
+<div><label>📷 Photo of the dead bird(s) * — must be attached whenever birds died</label><input id="shimg" type="file" accept="image/*" style="width:auto"><div id="shimgprev" style="margin-top:6px"></div></div>
+<label>🍽️ 3. FEED</label>
+<div class="grid2"><div><label style="font-weight:400"><input id="shfeed" type="checkbox" checked style="width:auto"> Birds were fed today</label></div><div><label>Feed type / note *</label><input id="shfq" placeholder="e.g. layer mash" required></div></div>
+<div class="grid2"><div><label>Feed used (bags, number — write 0 if none) *</label><input id="shfb" type="number" min="0" step="0.5" placeholder="e.g. 3" required></div><div><label>Feed used (kg, number — write 0 if none) *</label><input id="shfk" type="number" min="0" step="0.5" placeholder="e.g. 25" required></div></div>
+<div><label>Birds fed (count) *</label><input id="shbf" type="number" min="0" step="1" placeholder="e.g. 500" required></div>
+<label>💧 4. WATER</label>
+<div class="grid2"><div><label style="font-weight:400"><input id="shwat" type="checkbox" checked style="width:auto"> Fresh water given</label></div><div><label>Water used (litres, number — write 0 if none) *</label><input id="shwl" type="number" min="0" step="0.5" placeholder="e.g. 40" required></div></div>
+<div><label>Water notes *</label><input id="shwn" placeholder="e.g. drinkers topped up, none" required></div>
+<label>🥚 5. EGGS COLLECTED / PACKED</label>
+<div class="grid2"><div><label>Eggs collected (number) *</label><input id="shec" type="number" min="0" step="1" placeholder="e.g. 300" required></div><div><label>Egg crates packed (number) *</label><input id="shec2" type="number" min="0" step="1" placeholder="e.g. 10" required></div></div>
+<div class="grid2"><div><label>Eggs broken / spoilt *</label><input id="sheb" type="number" min="0" step="1" placeholder="write 0 if none" required></div><div></div></div>
+<label>🧾 6. SOLD FROM STOCK (optional - reduces stock and adds money automatically)</label>
+<div id="shrows"></div>
+<div class="row"><button type="button" class="btn btn-o" onclick="shAddRow()">+ Add another product</button><div class="spacer"></div><span id="shgrand" style="font-weight:800"></span></div>
+<div class="grid2"><div><label>Payment (applies to all lines)</label><select id="shpm"><option value="cash">Cash</option><option value="mobile_money">Mobile Money</option><option value="bank_transfer">Bank Transfer</option><option value="other">Other</option></select></div><div></div></div>
+<label>💰 7. TOTAL AMOUNT YOU GOT TODAY (GH₵) *</label>
+<div><label>Write the total money you received — the manager sees it in the report and in the archive. Write 0 if you got nothing.</label><input id="sham" type="number" min="0" step="0.01" placeholder="e.g. 350.00" required></div>
+<label>⚠️ 8. OTHER ACTIVITIES / PROBLEMS YOU SAW *</label><textarea id="shpr" placeholder="Anything else you did or anything that went wrong... write None if nothing" required></textarea>
+<label>📝 9. NOTES FOR MANAGER *</label><textarea id="shnt" placeholder="Anything else... write None if nothing" required></textarea>
+<button class="btn btn-g" type="submit" style="font-size:17px;padding:14px">📩 Send my daily report</button>
+</form>
+<div class="panel" style="margin-top:12px"><h2>My reports</h2><div id="shmylist">Loading...</div></div></div>
+</div>
+<div id="notif" style="display:none" class="panel"><h2>Notifications</h2><div id="nt"></div></div>
+</div>
+</div>
+<div class="tkback" id="tkback" onclick="hideTy(event)">
+<div class="tkcard" onclick="event.stopPropagation()">
+<div class="tkemoji" id="tkemoji">🎉</div>
+<h2 id="tktitle">Thank you for the report!</h2>
+<p id="tkmsg">Great job today. Your report has been sent to the manager.</p>
+<div class="tkdet" id="tkdet"></div>
+<p style="font-size:13px;color:#6b7280">The manager will check it and may send you a comment.</p>
+<button class="btn btn-g" type="button" onclick="hideTy()" style="width:100%;font-size:16px;padding:12px">👍 Okay, keep up the good work</button>
+</div>
+</div>
+<script src="js/app.js"></script>
+<script src="js/worker.js"></script>
+</body>
+</html>

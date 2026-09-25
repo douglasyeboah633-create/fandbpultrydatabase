@@ -1,0 +1,7 @@
+User-agent: *
+Allow: /
+
+# This is the public farm page — everything here may be shown in Google.
+
+# Once your site is online, add your sitemap address here, for example:
+# Sitemap: https://YOUR-SITE-ADDRESS/sitemap.xml

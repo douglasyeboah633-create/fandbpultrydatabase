@@ -1,0 +1,10 @@
+# ---- running the farm system (your PC) ----
+flask
+flask-cors
+flask-bcrypt
+flask-jwt-extended
+flask-sqlalchemy
+python-dotenv
+
+# ---- only needed when hosting the site online (Linux servers) ----
+gunicorn

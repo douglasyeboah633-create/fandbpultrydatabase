@@ -18,10 +18,19 @@ Copy `backend/.env.example` to `backend/.env` and put your own values in it.
 ## Deploy online (Render)
 1. Upload this folder to GitHub (the database, photos and `.env` are excluded by `.gitignore`).
 2. On Render: New + → Web Service → pick the repo.
-   Build: `pip install -r backend/requirements.txt` · Start: `gunicorn --chdir backend app:app`
+   - **Build Command:** `pip install -r requirements.txt`
+   - **Start Command:** `gunicorn --chdir backend -b 0.0.0.0:$PORT app:app`
+
+   ⚠️ The Start Command must **run the app** — it is not a `pip install`.
+   Putting `pip install ...` in the Start Command fails with
+   `ERROR: Could not open requirements file` and `Exited with status 1`.
+   ⚠️ The `-b 0.0.0.0:$PORT` part is required: without it Render cannot reach
+   the server.
 3. In Render → Environment, set `MANAGER_NAME`, `MANAGER_USERNAME`,
    `MANAGER_EMAIL`, `MANAGER_PASSWORD` and `JWT_SECRET`.
 4. Open the Render URL once, then log in with your manager username/password.
+5. To check the site is configured correctly, open
+   `<your-render-url>/api/auth/diag`. It should say `"ok": true`.
 
 ## Deploy online (Vercel)
 This repo also contains `wsgi.py`, so Vercel can run the same app.

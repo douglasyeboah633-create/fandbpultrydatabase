@@ -3,11 +3,16 @@ services:
     name: fandb-poultry
     runtime: python
     plan: free
-    buildCommand: pip install -r backend/requirements.txt
+    # Render's build step. Installs from the ROOT requirements.txt, which now
+    # includes gunicorn so the start command below can find it.
+    buildCommand: pip install -r requirements.txt
+    # Render's start step. This is the command that must actually RUN the app -
+    # it is not a pip install. (A start command of "pip install -r ..." is the
+    # cause of "Exited with status 1" on this project.)
     startCommand: gunicorn --chdir backend -b 0.0.0.0:$PORT app:app
     envVars:
       - key: PYTHON_VERSION
-        value: 3.11.9
+        value: "3.12"
       - key: MANAGER_NAME
         sync: false
       - key: MANAGER_USERNAME

@@ -51,6 +51,23 @@ async function doLogin(e){
   setTimeout(()=>{ location.href = j.user.role==='manager'?'manager.html':'worker.html'; },600);
  }catch(err){ say('#m',false,err.message); }
 }
+// Ask the server WHY it might keep signing you out, and say it plainly.
+// (A hosted copy with no shared key signs every login with a different key,
+// so the next page load refuses the token and you land back here.)
+(async function(){
+ try{
+  const d = await fetch('/api/auth/diag').then(r=>r.json());
+  if (d && d.hosted && !d.stable_key) {
+   say('#m', false,
+    'This site runs on a free host that forgets logins. Set MANAGER_PASSWORD '+
+    'and JWT_SECRET in Vercel -> Settings -> Environment Variables (tick '+
+    'Production) -> Save -> Redeploy. See README.md.');
+  } else if (d && d.hosted && !d.manager_exists) {
+   say('#m', false, 'This copy has no manager account yet - use the set-up form below.');
+  }
+ }catch(e){}
+})();
+
 async function forgot(){
  try{ const j = await api('/api/auth/forgot',{method:'POST',body:{}}); say('#m',true,j.message); }
  catch(err){ say('#m',false,err.message); }

@@ -204,6 +204,35 @@ def forgot():
     return jsonify({'message': 'Please contact your manager to reset your password.'})
 
 
+@app.route('/api/auth/diag', methods=['GET'])
+def auth_diag():
+    """Tell the login page WHY a hosted copy keeps signing the user out.
+
+    A free host (Vercel) runs many copies of this app. If no shared key is set
+    on the hosting site, every copy signs logins with its own random key, so a
+    token made by one copy is refused by the next - which looks exactly like
+    "I logged in and it threw me back to the login page".
+
+    This endpoint never reveals a secret. It only reports whether the shared
+    key is present, so the page can show the exact fix.
+    """
+    try:
+        mgr = User.query.filter_by(role='manager').first()
+    except Exception:
+        mgr = None
+    env_secret = bool((os.environ.get('JWT_SECRET') or '').strip())
+    env_pwd = bool((os.environ.get('MANAGER_PASSWORD') or '').strip())
+    hosted = bool(os.environ.get('VERCEL') or os.environ.get('RENDER'))
+    return jsonify({
+        'manager_exists': bool(mgr),
+        'username': mgr.username if mgr else None,
+        # A stable key across all copies needs JWT_SECRET or MANAGER_PASSWORD.
+        'stable_key': env_secret or env_pwd,
+        'hosted': hosted,
+        'ok': bool(mgr) and (env_secret or env_pwd or not hosted),
+    })
+
+
 @app.route('/api/auth/setup', methods=['POST'])
 def setup_manager():
     """First-time set-up straight from the login page.

@@ -9,7 +9,18 @@ services:
     # Render's start step. This is the command that must actually RUN the app -
     # it is not a pip install. (A start command of "pip install -r ..." is the
     # cause of "Exited with status 1" on this project.)
-    startCommand: gunicorn --chdir backend -b 0.0.0.0:$PORT app:app
+    #
+    # It runs from the ROOT folder, where app.py is the door into backend/app.py.
+    # (Before that door existed this command died with
+    # "ModuleNotFoundError: No module named 'app'".)
+    #
+    # The --chdir backend form is NOT needed any more, and gunicorn.conf.py in
+    # this folder already sets the port, so even the plain "gunicorn app:app"
+    # that Render's dashboard sometimes keeps from an earlier try now works too.
+    startCommand: gunicorn -b 0.0.0.0:$PORT app:app
+    # Render only sends traffic once this answers 200. It never reveals a
+    # secret - see the login page for what it reports.
+    healthCheckPath: /api/auth/diag
     envVars:
       - key: PYTHON_VERSION
         value: "3.12"

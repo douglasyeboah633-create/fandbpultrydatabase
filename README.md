@@ -19,18 +19,58 @@ Copy `backend/.env.example` to `backend/.env` and put your own values in it.
 1. Upload this folder to GitHub (the database, photos and `.env` are excluded by `.gitignore`).
 2. On Render: New + → Web Service → pick the repo.
    - **Build Command:** `pip install -r requirements.txt`
-   - **Start Command:** `gunicorn --chdir backend -b 0.0.0.0:$PORT app:app`
+   - **Start Command:** `gunicorn -b 0.0.0.0:$PORT app:app`
+
+   Both lines are also saved in `render.yaml`, so a repo connected as a Render
+   **Blueprint** fills them in for you.
+
+   ✅ The server starts from the **root** folder of the repo, and the `app.py`
+   sitting in that root is a small door into `backend/app.py`. That door is what
+   fixes the old crash
+
+   ```
+   ModuleNotFoundError: No module named 'app'
+   ```
+
+   which happened because the root folder had no `app.py` at all — only
+   `backend/app.py`. With the door in place, every one of these Start Commands
+   works, so a leftover command from an earlier try cannot break the site:
+
+   ```
+   gunicorn
+   gunicorn app:app
+   gunicorn -b 0.0.0.0:$PORT app:app
+   gunicorn wsgi:app
+   ```
 
    ⚠️ The Start Command must **run the app** — it is not a `pip install`.
    Putting `pip install ...` in the Start Command fails with
    `ERROR: Could not open requirements file` and `Exited with status 1`.
-   ⚠️ The `-b 0.0.0.0:$PORT` part is required: without it Render cannot reach
-   the server.
+   ✅ The port needs no thought: `gunicorn.conf.py` in this folder already binds
+   the server to `0.0.0.0:$PORT`, so you cannot forget `-b ...`. A command line
+   `-b ...` simply overrides it.
+   📍 If your Render dashboard still holds an older command, fix it in
+   **Render → your service → Settings → Runtime → Start Command → Save**
+   (Render restarts the service by itself; no new deploy needed).
 3. In Render → Environment, set `MANAGER_NAME`, `MANAGER_USERNAME`,
-   `MANAGER_EMAIL`, `MANAGER_PASSWORD` and `JWT_SECRET`.
+   `MANAGER_EMAIL`, `MANAGER_PASSWORD` and `JWT_SECRET` — make `JWT_SECRET` long
+   random text of **32 characters or more**, otherwise the login library warns
+   about a weak key. Optional knobs the same page understands: `FB_WORKERS`
+   (leave it at 1 — the farm keeps everything in one database file),
+   `FB_TIMEOUT` (default 120 seconds) and `FB_LOG_LEVEL`.
 4. Open the Render URL once, then log in with your manager username/password.
 5. To check the site is configured correctly, open
    `<your-render-url>/api/auth/diag`. It should say `"ok": true`.
+   Render uses that same address as the health check (`healthCheckPath` in
+   `render.yaml`), so the service is only marked live once the app answers.
+
+> **Free Render plan:** the files live on a temporary disk, so reports, photos
+> and accounts vanish when the service deploys again or restarts (a permanent
+> **Disk** needs a paid instance). If you do pay for one, mount it and set
+> `FB_DATA_DIR` to its folder — e.g. `/var/farm-data` — and the app will keep the
+> database, the photos and the login key there. Either way, press
+> **Download full backup** on the Manager page regularly.
+
 
 ## Deploy online (Vercel)
 This repo also contains `wsgi.py`, so Vercel can run the same app.
